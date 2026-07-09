@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vscode/
+.env
+.env.local
+public/videos/
+public/assets/projects/polypath/*.mp4
+public/downloads/*.zip
