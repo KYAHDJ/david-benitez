@@ -513,10 +513,15 @@ function Slideshow({ project, variant }: { project: Project; variant: "card" | "
             <img src={src} alt={`${project.name} screenshot ${idx + 1}`} loading={variant === "card" && idx === 0 ? "eager" : "lazy"} decoding="async" />
           </div>
         ))
+      ) : project.youtubeEmbed ? (
+        <div className="slide active video-preview">
+          <img src={youtubeThumb(project.youtubeEmbed)} alt={`${project.name} gameplay preview`} loading="lazy" decoding="async" />
+          <span className="play-overlay"><Play size={18} fill="#fff" /></span>
+        </div>
       ) : (
         <div className="slide placeholder active">
           <ImgIcon />
-          <span>{project.youtubeEmbed ? "Gameplay video available" : "Screens coming soon"}</span>
+          <span>Screens coming soon</span>
         </div>
       )}
       {hasShots && shots.length > 1 && (
@@ -534,6 +539,11 @@ function Slideshow({ project, variant }: { project: Project; variant: "card" | "
   );
 }
 
+function youtubeThumb(embedUrl: string) {
+  const id = embedUrl.split("/embed/")[1]?.split("?")[0];
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
 function ImgIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width="30%" height="30%">
@@ -544,9 +554,9 @@ function ImgIcon() {
   );
 }
 
-function ProjectCard({ project, onOpen, orphan }: { project: Project; onOpen: () => void; orphan?: boolean }) {
+function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
   return (
-    <article className={`card ${orphan ? "orphan" : ""}`} onClick={onOpen}>
+    <article className="card" onClick={onOpen}>
       <Slideshow project={project} variant="card" />
       <div className="card-body">
         <div className="card-head">
@@ -617,20 +627,21 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 function SelectedWork() {
   const gridRef = useRef<HTMLDivElement>(null);
   const [openId, setOpenId] = useState<string | null>(null);
-  const [orphanId, setOrphanId] = useState<string | null>(null);
+  const [cols, setCols] = useState(3);
 
   useEffect(() => {
     const el = gridRef.current;
     if (!el) return;
-    const compute = () => {
-      const cols = getComputedStyle(el).gridTemplateColumns.split(" ").length;
-      const remainder = PROJECTS.length % cols;
-      setOrphanId(remainder === 1 ? PROJECTS[PROJECTS.length - 1].id : null);
-    };
+    const compute = () => setCols(getComputedStyle(el).gridTemplateColumns.split(" ").length);
     compute();
     window.addEventListener("resize", compute);
     return () => window.removeEventListener("resize", compute);
   }, []);
+
+  const remainder = PROJECTS.length % cols;
+  const splitAt = remainder === 0 ? PROJECTS.length : PROJECTS.length - remainder;
+  const mainItems = PROJECTS.slice(0, splitAt);
+  const leftoverItems = PROJECTS.slice(splitAt);
 
   const openProject = PROJECTS.find((p) => p.id === openId) || null;
 
@@ -645,9 +656,16 @@ function SelectedWork() {
       </div>
       <Reveal delay={0.1}>
         <div className="project-grid" ref={gridRef}>
-          {PROJECTS.map((project) => (
-            <ProjectCard key={project.id} project={project} orphan={project.id === orphanId} onOpen={() => setOpenId(project.id)} />
+          {mainItems.map((project) => (
+            <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
           ))}
+          {leftoverItems.length > 0 && (
+            <div className="orphan-row">
+              {leftoverItems.map((project) => (
+                <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
+              ))}
+            </div>
+          )}
         </div>
       </Reveal>
       {openProject && <ProjectModal project={openProject} onClose={() => setOpenId(null)} />}
@@ -912,10 +930,13 @@ function Style() {
     .project-grid { max-width: 1200px; margin: 0 auto; padding: 0 48px 150px; display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 20px; }
     @media (min-width: 640px) { .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; } }
     @media (min-width: 1024px) { .project-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+    .orphan-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+    @media (min-width: 640px) { .orphan-row { gap: 22px; } }
+    @media (min-width: 1024px) { .orphan-row { gap: 24px; } }
+    .orphan-row > .card { flex: 0 1 340px; }
 
     .card { position: relative; background: #141414; border: 1px solid #242424; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: border-color .3s, transform .3s, box-shadow .3s; }
     .card:hover, .card:focus-within { border-color: color-mix(in srgb, var(--accent) 45%, #333); box-shadow: 0 22px 44px -26px color-mix(in srgb, var(--accent) 45%, transparent); transform: translateY(-3px); }
-    .card.orphan { grid-column: 1 / -1; justify-self: center; width: 100%; max-width: 360px; }
 
     .slideshow { position: relative; aspect-ratio: 4/3; overflow: hidden; background: radial-gradient(120% 100% at 15% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), #101010; border-bottom: 1px solid #242424; touch-action: pan-y; user-select: none; }
     .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px; opacity: 0; transition: opacity .55s ease; }
@@ -924,6 +945,14 @@ function Style() {
     .slide.placeholder { flex-direction: column; gap: 8px; color: #666; }
     .slide.placeholder svg { color: var(--accent); opacity: .55; }
     .slide.placeholder span { font-size: 11px; letter-spacing: .03em; }
+    .video-preview { padding: 0; }
+    .video-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; box-shadow: none; }
+    .play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .play-overlay svg { width: 20px; height: 20px; margin-left: 2px; }
+    .play-overlay { color: #fff; }
+    .play-overlay::before { content: ""; position: absolute; width: 52px; height: 52px; border-radius: 50%; background: rgba(9,9,9,.55); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,.25); transition: transform .25s ease, background .25s ease; }
+    .card:hover .play-overlay::before, .card:focus-within .play-overlay::before { transform: scale(1.08); background: rgba(9,9,9,.72); }
+    .play-overlay svg { position: relative; z-index: 1; }
     .idx-pill, .status-pill { position: absolute; top: 10px; z-index: 3; font-size: 10.5px; letter-spacing: .04em; color: #fff; background: rgba(9,9,9,.6); backdrop-filter: blur(6px); padding: 5px 9px; border-radius: 999px; border: 1px solid #242424; display: flex; align-items: center; gap: 6px; }
     .idx-pill { left: 10px; color: #b5b5b5; }
     .status-pill { right: 10px; }
