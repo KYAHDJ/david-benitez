@@ -303,24 +303,6 @@ function PolyMark() {
   );
 }
 
-function DryNavMark() {
-  return (
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="dnGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2dd4bf" />
-          <stop offset="1" stopColor="#0e7490" />
-        </linearGradient>
-      </defs>
-      <path d="M32 4C20 19 9 32 9 43a23 23 0 0 0 46 0C55 32 44 19 32 4Z" fill="url(#dnGrad)" stroke="#eafffb" strokeWidth={2} />
-      <path d="M18 44c5-7 12-6 15-12s10-8 13-15" stroke="#fff" strokeWidth={5} fill="none" strokeLinecap="round" />
-      <path d="M18 44c5-7 12-6 15-12s10-8 13-15" stroke="#86efac" strokeWidth={1.6} fill="none" strokeDasharray="3 3.4" strokeLinecap="round" />
-      <circle cx="46" cy="17" r="5.4" fill="#fff" />
-      <circle cx="46" cy="17" r="2.4" fill="#22c55e" />
-    </svg>
-  );
-}
-
 function PlayMark() {
   return (
     <svg viewBox="0 0 100 100" width="20" height="20">
@@ -435,7 +417,7 @@ const PROJECTS: Project[] = [
       "Live map presence with selectable mood-character markers that switch to a directional arrow once you start driving.",
       "Saved Places for one-tap navigation, plus email and Google sign-in with in-app password change and account deletion.",
     ],
-    icon: { type: "svg", node: <DryNavMark /> },
+    icon: { type: "img", src: "/assets/projects/drynav/icon.png" },
     screenshots: [],
     accent: "#14B8A6",
     action: { kind: "soon", label: "APK coming soon" },
