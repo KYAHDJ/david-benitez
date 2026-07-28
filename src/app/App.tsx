@@ -418,9 +418,14 @@ const PROJECTS: Project[] = [
       "Saved Places for one-tap navigation, plus email and Google sign-in with in-app password change and account deletion.",
     ],
     icon: { type: "img", src: "/assets/projects/drynav/icon.png" },
-    screenshots: [],
+    screenshots: [
+      "/assets/projects/drynav/screenshot-1.jpg",
+      "/assets/projects/drynav/screenshot-2.png",
+      "/assets/projects/drynav/screenshot-3.png",
+      "/assets/projects/drynav/screenshot-4.jpg",
+    ],
     accent: "#14B8A6",
-    action: { kind: "soon", label: "APK coming soon" },
+    action: { kind: "download", label: "Download APK", href: "https://media.githubusercontent.com/media/KYAHDJ/david-benitez/main/public/downloads/DryNav.apk" },
   },
 ];
 
