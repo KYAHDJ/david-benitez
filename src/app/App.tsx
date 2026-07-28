@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, Download, Linkedin, Menu, Play, X } from "lucide-react";
 
+type ProjectAction =
+  | { kind: "play"; href: string }
+  | { kind: "beta"; label: string; href: string }
+  | { kind: "download"; label: string; href: string }
+  | { kind: "link"; label: string; href: string }
+  | { kind: "soon"; label: string };
+
+type ProjectIcon = { type: "img"; src: string } | { type: "svg"; node: React.ReactNode };
+
 type Project = {
   id: string;
   name: string;
@@ -9,15 +18,11 @@ type Project = {
   desc: string;
   tags: string[];
   bullets: string[];
-  icon?: string;
-  screenshots?: string[];
-  screenshotLayout?: "phone" | "desktop";
-  video?: string;
+  icon?: ProjectIcon;
+  screenshots: string[];
   youtubeEmbed?: string;
   accent: string;
-  actionLabel: string;
-  actionHref: string;
-  actionDownload?: boolean;
+  action: ProjectAction;
 };
 
 function useInView(threshold = 0.12, once = true) {
@@ -289,20 +294,59 @@ function WhyIBuild() {
   );
 }
 
+function PolyMark() {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round">
+      <path d="M24 5l17 10v18L24 43 7 33V15z" />
+      <path d="M24 5v19M7 15l17 9M41 15l-17 9M24 43V24" />
+    </svg>
+  );
+}
+
+function DryNavMark() {
+  return (
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="dnGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2dd4bf" />
+          <stop offset="1" stopColor="#0e7490" />
+        </linearGradient>
+      </defs>
+      <path d="M32 4C20 19 9 32 9 43a23 23 0 0 0 46 0C55 32 44 19 32 4Z" fill="url(#dnGrad)" stroke="#eafffb" strokeWidth={2} />
+      <path d="M18 44c5-7 12-6 15-12s10-8 13-15" stroke="#fff" strokeWidth={5} fill="none" strokeLinecap="round" />
+      <path d="M18 44c5-7 12-6 15-12s10-8 13-15" stroke="#86efac" strokeWidth={1.6} fill="none" strokeDasharray="3 3.4" strokeLinecap="round" />
+      <circle cx="46" cy="17" r="5.4" fill="#fff" />
+      <circle cx="46" cy="17" r="2.4" fill="#22c55e" />
+    </svg>
+  );
+}
+
+function PlayMark() {
+  return (
+    <svg viewBox="0 0 100 100" width="20" height="20">
+      <path d="M18 8 L18 92 L50 50 Z" fill="#00c8ff" />
+      <path d="M18 8 L68 33 L50 50 Z" fill="#00e676" />
+      <path d="M18 92 L68 67 L50 50 Z" fill="#ff3b5c" />
+      <path d="M68 33 L86 43 A6 6 0 0 1 86 57 L68 67 L50 50 Z" fill="#ffcc00" />
+    </svg>
+  );
+}
+
 const PROJECTS: Project[] = [
   {
     id: "01",
     name: "DoPalette",
-    type: "Android Coloring Application",
-    status: "Closed Beta Testing",
-    desc: "A coloring app built around creativity, offline saving, image export, Firebase accounts, and community sharing.",
-    tags: ["Kotlin", "Firebase Authentication", "Firestore", "Android SDK", "AdMob"],
+    type: "Android · Coloring app",
+    status: "Live on Google Play",
+    desc: "A coloring app built around creativity: brush and bucket-fill tools, offline artwork saving, image export, and Firebase-backed accounts with community sharing.",
+    tags: ["Kotlin", "Firebase Auth", "Firestore", "Android SDK", "AdMob"],
     bullets: [
       "Designed and developed an Android coloring application with brush tools, bucket fill, offline artwork saving, and image export.",
       "Integrated Firebase Authentication, user profiles, achievements, and a community artwork-sharing system.",
       "Focused on responsive UI, usability, performance, and a smooth coloring experience across phones and tablets.",
+      "Published and live on Google Play after closed and open testing phases.",
     ],
-    icon: "/assets/projects/dopalette/icon.png",
+    icon: { type: "img", src: "/assets/projects/dopalette/icon.png" },
     screenshots: [
       "/assets/projects/dopalette/screenshot-1.jpg",
       "/assets/projects/dopalette/screenshot-2.jpg",
@@ -312,22 +356,22 @@ const PROJECTS: Project[] = [
       "/assets/projects/dopalette/screenshot-6.jpg",
     ],
     accent: "#8B5CF6",
-    actionLabel: "Become a Tester",
-    actionHref: "https://play.google.com/apps/testing/com.dopalette.app",
+    action: { kind: "play", href: "https://play.google.com/store/apps/details?id=com.dopalette.app" },
   },
   {
     id: "02",
     name: "Dosevia",
-    type: "Medication Reminder Application",
+    type: "Android · Medication reminders",
     status: "Open Beta Testing",
-    desc: "A reminder app focused on clear scheduling, persistent local data, and simple daily medication tracking.",
-    tags: ["React", "TypeScript", "Capacitor", "Android", "Local Notifications"],
+    desc: "A reminder app focused on clear scheduling, persistent local data, and simple daily medication tracking so nothing gets missed.",
+    tags: ["React", "TypeScript", "Capacitor", "Local Notifications"],
     bullets: [
       "Built a medication reminder application with customizable schedules and notification settings.",
       "Implemented persistent local storage and reminder management for offline functionality.",
       "Designed a clean, accessible, and user-friendly interface optimized for Android devices.",
+      "Currently open to public beta testers ahead of a full Play Store release.",
     ],
-    icon: "/assets/projects/dosevia/icon.png",
+    icon: { type: "img", src: "/assets/projects/dosevia/icon.png" },
     screenshots: [
       "/assets/projects/dosevia/screenshot-1.jpg",
       "/assets/projects/dosevia/screenshot-2.jpg",
@@ -335,16 +379,15 @@ const PROJECTS: Project[] = [
       "/assets/projects/dosevia/screenshot-4.jpg",
     ],
     accent: "#EC4899",
-    actionLabel: "Become a Beta Tester",
-    actionHref: "https://play.google.com/apps/testing/com.dosevia.app",
+    action: { kind: "beta", label: "Join the open beta", href: "https://play.google.com/apps/testing/com.dosevia.app" },
   },
   {
     id: "03",
     name: "Sama Na U Wedding",
-    type: "Responsive Wedding Website",
+    type: "Website",
     status: "Live Website",
     desc: "A responsive wedding website built to present event details, countdown, venues, gallery, and RSVP information in a clean and elegant layout.",
-    tags: ["HTML", "CSS", "JavaScript", "Responsive Design", "GitHub Pages"],
+    tags: ["HTML", "CSS", "JavaScript", "GitHub Pages"],
     bullets: [
       "Built a clean wedding website with sections for the countdown, save the date, venues, gallery, and RSVP.",
       "Designed the layout to work across desktop and mobile devices with simple navigation and organized event information.",
@@ -356,163 +399,271 @@ const PROJECTS: Project[] = [
       "/assets/projects/samanau/gallery.png",
       "/assets/projects/samanau/rsvp.png",
     ],
-    screenshotLayout: "desktop",
     accent: "#D4AF37",
-    actionLabel: "Live Preview",
-    actionHref: "https://kyahdj.github.io/SamaNaUWedding/",
+    action: { kind: "link", label: "View live site", href: "https://kyahdj.github.io/SamaNaUWedding/" },
   },
   {
     id: "04",
     name: "PolyPath",
-    type: "Educational 3D Learning Game",
+    type: "PC · Educational 3D game",
     status: "School Capstone Project",
     desc: "An educational PC game created as a capstone project to teach beginners 3D modeling fundamentals through progression-based learning.",
-    tags: ["Unity", "C#", "Blender", "Game Development", "Educational Software"],
+    tags: ["Unity", "C#", "Blender"],
     bullets: [
       "Developed an educational 3D game that teaches beginners the fundamentals of 3D modeling.",
       "Designed progression-based learning mechanics to improve engagement and retention.",
       "Created 3D assets, environments, lighting, and animations using Blender and Unity.",
     ],
+    icon: { type: "svg", node: <PolyMark /> },
+    screenshots: [],
     youtubeEmbed: "https://www.youtube.com/embed/DXXD1eb3ZZY",
     accent: "#F97316",
-    actionLabel: "Download Game (Windows)",
-    actionHref: "https://github.com/KYAHDJ/david-benitez/releases/download/v1.0/PolyPath.zip",
+    action: { kind: "download", label: "Download for Windows", href: "https://github.com/KYAHDJ/david-benitez/releases/download/v1.0/PolyPath.zip" },
+  },
+  {
+    id: "05",
+    name: "DryNav",
+    type: "Android · Flood-aware navigation",
+    status: "In Development",
+    desc: "A Waze-style navigation app that routes drivers around flooded roads in real time, built with Jetpack Compose, the Mapbox Navigation SDK, and Firebase. Started as a favor for my sister's school project, still actively in progress.",
+    tags: ["Kotlin", "Jetpack Compose", "Mapbox Nav SDK", "Firebase"],
+    bullets: [
+      "Turn-by-turn directions that automatically avoid roads marked flooded or blocked, with silent rerouting and no interrupting popups.",
+      "Live traffic, satellite, and terrain map layers alongside the flood-aware routing.",
+      "Community flood reporting: tap-to-pin or brush-draw the affected stretch, mark it slow or blocked, attach a photo and description.",
+      "Admin moderation queue for reports, filterable by city and barangay, with reports auto-expiring after 6 hours.",
+      "Live map presence with selectable mood-character markers that switch to a directional arrow once you start driving.",
+      "Saved Places for one-tap navigation, plus email and Google sign-in with in-app password change and account deletion.",
+    ],
+    icon: { type: "svg", node: <DryNavMark /> },
+    screenshots: [],
+    accent: "#14B8A6",
+    action: { kind: "soon", label: "APK coming soon" },
   },
 ];
 
-function ImageLightbox({ images, index, projectName, onClose, onMove }: { images: string[]; index: number; projectName: string; onClose: () => void; onMove: (index: number) => void }) {
+function ActionButton({ project }: { project: Project }) {
+  const a = project.action;
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+  if (a.kind === "play") {
+    return (
+      <a className="play-badge" href={a.href} target="_blank" rel="noreferrer" onClick={stop}>
+        <PlayMark />
+        <span className="txt"><span className="g">Get it on</span><span className="n">Google Play</span></span>
+      </a>
+    );
+  }
+  if (a.kind === "beta") {
+    return (
+      <a className="beta-badge" href={a.href} target="_blank" rel="noreferrer" onClick={stop}>
+        <Play size={16} /><span>{a.label}</span>
+      </a>
+    );
+  }
+  if (a.kind === "download") {
+    return (
+      <a className="btn solid" href={a.href} download onClick={stop}>
+        <Download size={13} />{a.label}
+      </a>
+    );
+  }
+  if (a.kind === "soon") {
+    return <span className="btn soon" onClick={stop}>{a.label}</span>;
+  }
+  return (
+    <a className="btn" href={a.href} target="_blank" rel="noreferrer" onClick={stop}>
+      <ArrowUpRight size={13} />{a.label}
+    </a>
+  );
+}
+
+function ProjectIconTile({ project }: { project: Project }) {
+  if (!project.icon) return null;
+  return (
+    <div className="card-icon" style={{ color: project.accent }}>
+      {project.icon.type === "img"
+        ? <img src={project.icon.src} alt={`${project.name} icon`} loading="lazy" decoding="async" />
+        : project.icon.node}
+    </div>
+  );
+}
+
+function Slideshow({ project, variant }: { project: Project; variant: "card" | "modal" }) {
+  const shots = project.screenshots;
+  const hasShots = shots.length > 0;
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const touchX = useRef<number | null>(null);
+
   useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-      if (event.key === "ArrowLeft") onMove((index - 1 + images.length) % images.length);
-      if (event.key === "ArrowRight") onMove((index + 1) % images.length);
-    };
+    if (!hasShots || shots.length < 2 || paused) return;
+    const t = setInterval(() => setI((v) => (v + 1) % shots.length), 3200);
+    return () => clearInterval(t);
+  }, [hasShots, shots.length, paused]);
+
+  const go = (n: number) => setI(((n % shots.length) + shots.length) % shots.length);
+
+  return (
+    <div
+      className="slideshow"
+      style={{ ["--accent" as any]: project.accent }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onPointerDown={(e) => { touchX.current = e.clientX; setPaused(true); }}
+      onPointerUp={(e) => {
+        if (touchX.current === null) return;
+        const dx = e.clientX - touchX.current;
+        if (hasShots && Math.abs(dx) > 30) go(i + (dx < 0 ? 1 : -1));
+        touchX.current = null;
+        setPaused(false);
+      }}
+    >
+      <span className="idx-pill">{project.id}</span>
+      <span className="status-pill"><span className="dot" />{project.status}</span>
+      {hasShots ? (
+        shots.map((src, idx) => (
+          <div key={src} className={`slide ${idx === i ? "active" : ""}`}>
+            <img src={src} alt={`${project.name} screenshot ${idx + 1}`} loading={variant === "card" && idx === 0 ? "eager" : "lazy"} decoding="async" />
+          </div>
+        ))
+      ) : (
+        <div className="slide placeholder active">
+          <ImgIcon />
+          <span>{project.youtubeEmbed ? "Gameplay video available" : "Screens coming soon"}</span>
+        </div>
+      )}
+      {hasShots && shots.length > 1 && (
+        <>
+          <button className="nav-arrow prev" onClick={(e) => { e.stopPropagation(); go(i - 1); }} aria-label="Previous screenshot"><ChevronLeft size={13} /></button>
+          <button className="nav-arrow next" onClick={(e) => { e.stopPropagation(); go(i + 1); }} aria-label="Next screenshot"><ChevronRight size={13} /></button>
+          <div className="dots">
+            {shots.map((_, idx) => (
+              <button key={idx} className={idx === i ? "active" : ""} onClick={(e) => { e.stopPropagation(); go(idx); }} aria-label={`Screenshot ${idx + 1}`} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ImgIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width="30%" height="30%">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="8.5" cy="10" r="1.4" />
+      <path d="M21 16l-5.5-5.5L9 17" />
+    </svg>
+  );
+}
+
+function ProjectCard({ project, onOpen, orphan }: { project: Project; onOpen: () => void; orphan?: boolean }) {
+  return (
+    <article className={`card ${orphan ? "orphan" : ""}`} onClick={onOpen}>
+      <Slideshow project={project} variant="card" />
+      <div className="card-body">
+        <div className="card-head">
+          <ProjectIconTile project={project} />
+          <div><h3>{project.name}</h3><p className="card-type">{project.type}</p></div>
+        </div>
+        <p className="card-desc">{project.desc}</p>
+        <div className="chips">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+        <div className="card-foot">
+          <ActionButton project={project} />
+          <button className="details-link" onClick={(e) => { e.stopPropagation(); onOpen(); }}>
+            Full details <ArrowUpRight size={12} />
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [images.length, index, onClose, onMove]);
+  }, [onClose]);
 
   return (
-    <div className="lightbox" role="dialog" aria-modal="true" aria-label={`${projectName} screenshot viewer`}>
-      <button className="lightbox-close" onClick={onClose} aria-label="Close image viewer"><X size={22} /></button>
-      <button className="lightbox-arrow left" onClick={() => onMove((index - 1 + images.length) % images.length)} aria-label="Previous image"><ChevronLeft size={28} /></button>
-      <img src={images[index]} alt={`${projectName} screenshot ${index + 1}`} decoding="async" />
-      <button className="lightbox-arrow right" onClick={() => onMove((index + 1) % images.length)} aria-label="Next image"><ChevronRight size={28} /></button>
-      <div className="lightbox-count">{index + 1} / {images.length}</div>
+    <div className="overlay open" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label={`${project.name} details`}>
+        <button className="modal-close" onClick={onClose} aria-label="Close"><X size={14} /></button>
+        {project.youtubeEmbed ? (
+          <div className="video-frame modal-video">
+            <iframe
+              src={project.youtubeEmbed}
+              title={`${project.name} promotional video`}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <Slideshow project={project} variant="modal" />
+        )}
+        <div className="modal-body">
+          <div className="card-head">
+            <ProjectIconTile project={project} />
+            <div><h3>{project.name}</h3><p className="card-type" style={{ color: project.accent }}>{project.type}</p></div>
+          </div>
+          <p className="card-desc">{project.desc}</p>
+          <div className="chips">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+          <ul className="bullets">{project.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+          <div className="modal-bottom">
+            <div className="actions">
+              <ActionButton project={project} />
+              <a className="btn" href="#contact" onClick={onClose}>Ask about this</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function MediaShowcase({ project }: { project: Project }) {
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  if (project.youtubeEmbed) {
-    return (
-      <div className="video-frame product-video">
-        <iframe
-          src={project.youtubeEmbed}
-          title={`${project.name} promotional video`}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-        <div className="video-label"><Play size={14} /> YouTube preview</div>
-      </div>
-    );
-  }
-
-  if (project.video) {
-    return (
-      <div className="video-frame product-video">
-        <video src={project.video} controls preload="metadata" playsInline />
-        <div className="video-label"><Play size={14} /> Project video</div>
-      </div>
-    );
-  }
-
-  const shots = project.screenshots ?? [];
-  const previewShots = shots.slice(0, 4);
-  const isDesktopGallery = project.screenshotLayout === "desktop";
-
-  return (
-    <>
-      <div className={`screenshot-stage gallery-stage compact-gallery ${isDesktopGallery ? "desktop-gallery" : ""}`} style={{ ["--accent" as any]: project.accent }}>
-        <div className="gallery-top">
-          {project.icon && <img className="app-icon inline" src={project.icon} alt={`${project.name} icon`} loading="lazy" decoding="async" />}
-          <div>
-            <strong>{project.name}</strong>
-            <span>{shots.length} screenshots available</span>
-          </div>
-        </div>
-
-        <div className={isDesktopGallery ? "preview-desktop-grid" : "preview-phone-grid"} aria-label={`${project.name} screenshot previews`}>
-          {previewShots.map((src, i) => (
-            <button
-              className={isDesktopGallery ? "preview-desktop-card" : "preview-phone-card"}
-              key={src}
-              onClick={() => {
-                setActiveIndex(i);
-                setLightboxIndex(i);
-              }}
-              aria-label={`Open ${project.name} screenshot ${i + 1}`}
-            >
-              <img src={src} alt={`${project.name} screenshot ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} decoding="async" />
-            </button>
-          ))}
-        </div>
-
-        <div className="gallery-actions">
-          <button
-            className="view-gallery-button"
-            onClick={() => setLightboxIndex(activeIndex)}
-            aria-label={`View all ${project.name} screenshots`}
-          >
-            View all screenshots <span>{shots.length}</span>
-          </button>
-          <p>Click any preview to open the full image.</p>
-        </div>
-      </div>
-      {lightboxIndex !== null && <ImageLightbox images={shots} index={lightboxIndex} projectName={project.name} onClose={() => setLightboxIndex(null)} onMove={(i) => { setLightboxIndex(i); setActiveIndex(i); }} />}
-    </>
-  );
-}
-
-function ProjectSection({ project, index }: { project: Project; index: number }) {
-  const { ref, inView } = useInView(0.18);
-  const reverse = index % 2 === 1;
-
-  return (
-    <article ref={ref as any} className={`project-section ${reverse ? "reverse" : ""}`} style={{ ["--accent" as any]: project.accent }}>
-      <div className={`project-copy ${inView ? "show" : ""}`}>
-        <div className="project-meta"><span>{project.id}</span><b>{project.status}</b></div>
-        <h3>{project.name}</h3>
-        <p className="project-type">{project.type}</p>
-        <p className="project-desc">{project.desc}</p>
-        <div className="chips">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-        <ul>{project.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
-        <div className="project-actions">
-          <a href={project.actionHref} target={project.actionDownload ? undefined : "_blank"} rel={project.actionDownload ? undefined : "noreferrer"} download={project.actionDownload ? true : undefined}>
-            {project.actionDownload ? <Download size={14} /> : null}{project.actionLabel} <ArrowUpRight size={14} />
-          </a>
-          <a href="#contact">Ask About This</a>
-        </div>
-      </div>
-      <div className={`project-media ${inView ? "show" : ""}`}><MediaShowcase project={project} /></div>
-    </article>
-  );
-}
-
 function SelectedWork() {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [orphanId, setOrphanId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const compute = () => {
+      const cols = getComputedStyle(el).gridTemplateColumns.split(" ").length;
+      const remainder = PROJECTS.length % cols;
+      setOrphanId(remainder === 1 ? PROJECTS[PROJECTS.length - 1].id : null);
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+
+  const openProject = PROJECTS.find((p) => p.id === openId) || null;
+
   return (
     <section id="work" className="work">
       <div className="section-head">
-        <Reveal><p className="eyebrow">Selected Work</p><h2>Things I've built.</h2><p>Honest, hands-on work: one Android app in closed beta, one reminder app in open beta, and one capstone game built to help beginners learn 3D modeling.</p></Reveal>
+        <Reveal>
+          <p className="eyebrow">Selected Work</p>
+          <h2>Things I've built.</h2>
+          <p>Five projects, from a published Android app to one still taking shape, each built end to end from first commit to something real people use.</p>
+        </Reveal>
       </div>
-      {PROJECTS.map((project, index) => <ProjectSection key={project.name} project={project} index={index} />)}
+      <Reveal delay={0.1}>
+        <div className="project-grid" ref={gridRef}>
+          {PROJECTS.map((project) => (
+            <ProjectCard key={project.id} project={project} orphan={project.id === orphanId} onOpen={() => setOpenId(project.id)} />
+          ))}
+        </div>
+      </Reveal>
+      {openProject && <ProjectModal project={openProject} onClose={() => setOpenId(null)} />}
     </section>
   );
 }
@@ -620,7 +771,7 @@ const JOURNEY = [
   ["2023", "Gaming Edits & 2D Animation", "Combined animation with gaming edits and personal projects, then continued improving 2D animation."],
   ["2024", "School Projects, AR, VR & Arduino", "Produced animation projects for school, learned AR and VR development, built Arduino projects with camera integration, expanded Unity game development, and created an identity theft awareness video."],
   ["2025", "Graduation & PolyPath", "Graduated with a Bachelor of Science in Information Technology and completed PolyPath as our undergraduate capstone project."],
-  ["2026", "Apps in Testing", "Developed DoPalette in Closed Beta Testing and Dosevia in Open Beta Testing."],
+  ["2026", "Live Apps & New Projects", "Published DoPalette on Google Play, opened Dosevia to public beta testers, and started building DryNav, a flood-aware navigation app."],
 ];
 
 function Journey() {
@@ -676,7 +827,7 @@ function Footer() {
     <footer>
       <strong>Hi, I&apos;m David.</strong>
       <span>© 2026 David Jerano Garcia Benitez — Built with curiosity.</span>
-      <div><a href="#contact">Contact</a><a href="/resume/David_Benitez_Resume.pdf">Resume</a></div>
+      <div><a href="#contact">Contact</a><a href="/resume/BENITEZ,DAVID_RESUME.pdf" target="_blank" rel="noreferrer">Resume</a></div>
     </footer>
   );
 }
@@ -710,8 +861,8 @@ export default function App() {
 function Style() {
   return <style>{`
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; background: #090909; color: #fff; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { margin: 0; background: #090909; color: #fff; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     a { color: inherit; text-decoration: none; }
     button { font: inherit; }
     a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
@@ -768,64 +919,78 @@ function Style() {
     .section-head h2 { margin: 0 0 22px; }
     .section-head p { max-width: 980px; margin: 0; }
     .section-head.compact { padding: 0 0 60px; }
-    .project-section { max-width: 1200px; margin: 0 auto; min-height: 88vh; display: grid; grid-template-columns: .9fr 1.1fr; gap: 72px; align-items: center; padding: 80px 48px; border-top: 1px solid #242424; }
-    .project-section.reverse { grid-template-columns: 1.1fr .9fr; }
-    .project-section.reverse .project-copy { order: 2; }
-    .project-copy, .project-media { opacity: 0; transform: translateY(28px); transition: .9s cubic-bezier(.22,1,.36,1); }
-    .project-media { transition-delay: .12s; }
-    .project-copy.show, .project-media.show { opacity: 1; transform: none; }
-    .project-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; }
-    .project-meta span { color: #777; font-weight: 900; font-size: 12px; letter-spacing: .14em; }
-    .project-meta b { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; }
-    .project-copy h3 { font-size: clamp(48px, 6vw, 88px); margin: 0; line-height: .88; letter-spacing: -.065em; }
-    .project-type { color: #fff; margin: 18px 0 8px; font-weight: 800; }
-    .project-desc { color: #b5b5b5; line-height: 1.7; max-width: 520px; margin-bottom: 20px; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
     .chips span { border: 1px solid #242424; background: #141414; color: #fff; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; }
-    .project-copy ul { margin: 22px 0 28px; padding-left: 18px; color: #d9d9d9; line-height: 1.65; font-size: 14px; }
-    .project-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .screenshot-stage, .video-frame { content-visibility: auto; contain-intrinsic-size: 720px; position: relative; border: 1px solid #242424; background: radial-gradient(circle at 50% 0, color-mix(in srgb, var(--accent) 20%, transparent), transparent 45%), #121212; border-radius: 28px; padding: 22px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
-    .gallery-stage { display: grid; gap: 18px; }
-    .compact-gallery { gap: 22px; }
-    .preview-phone-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
-    .preview-phone-card { min-width: 0; border: 1px solid #303030; border-radius: 22px; padding: 8px; background: linear-gradient(180deg, #181818, #070707); cursor: zoom-in; box-shadow: 0 18px 44px rgba(0,0,0,.28); transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s; }
-    .preview-phone-card:hover { transform: translateY(-6px); border-color: var(--accent); }
-    .preview-phone-card img { width: 100%; aspect-ratio: 9/19.5; object-fit: contain; object-position: center; border-radius: 16px; background: #000; display: block; }
-    .preview-desktop-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
-    .preview-desktop-card { min-width: 0; border: 1px solid #303030; border-radius: 18px; padding: 8px; background: linear-gradient(180deg, #181818, #070707); cursor: zoom-in; box-shadow: 0 18px 44px rgba(0,0,0,.28); transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s; }
-    .preview-desktop-card:hover { transform: translateY(-6px); border-color: var(--accent); }
-    .preview-desktop-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; object-position: top center; border-radius: 12px; background: #000; display: block; }
-    .gallery-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-    .gallery-actions p { margin: 0; color: #8f8f8f; font-size: 12px; line-height: 1.5; }
-    .view-gallery-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #fff; background: #fff; color: #090909; border-radius: 999px; padding: 12px 18px; font-weight: 900; font-size: 12px; cursor: pointer; transition: .22s; }
-    .view-gallery-button:hover { transform: translateY(-2px); }
-    .view-gallery-button span { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 999px; background: #090909; color: #fff; font-size: 11px; }
-    .gallery-top { display: flex; align-items: center; gap: 14px; }
-    .gallery-top strong { display: block; font-size: 15px; }
-    .gallery-top span { display: block; color: #8f8f8f; font-size: 12px; margin-top: 3px; }
-    .app-icon { position: absolute; width: 76px; height: 76px; object-fit: cover; border-radius: 20px; top: 20px; right: 20px; z-index: 2; box-shadow: 0 12px 30px rgba(0,0,0,.35); }
-    .app-icon.inline { position: static; width: 54px; height: 54px; border-radius: 15px; flex: 0 0 auto; }
-    .featured-phone { justify-self: center; border: 0; padding: 0; background: linear-gradient(180deg, #181818, #070707); border-radius: 34px; cursor: zoom-in; width: min(100%, 330px); box-shadow: 0 26px 70px rgba(0,0,0,.45); transition: .28s cubic-bezier(.22,1,.36,1); }
-    .featured-phone:hover { transform: translateY(-5px) scale(1.01); }
-    .featured-phone img { width: 100%; aspect-ratio: 9/19.5; object-fit: contain; object-position: center; border-radius: 34px; border: 1px solid #303030; background: #000; display: block; }
-    .phone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(78px, 1fr)); gap: 10px; align-items: center; }
-    .thumbnail-strip { padding: 4px; border: 1px solid #242424; background: rgba(0,0,0,.22); border-radius: 20px; }
-    .phone-shot { border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: 16px; transition: .25s; opacity: .58; }
-    .phone-shot:hover, .phone-shot.active { transform: translateY(-3px); opacity: 1; }
-    .phone-shot.active img { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent); }
-    .phone-shot img { width: 100%; aspect-ratio: 9/19.5; object-fit: contain; object-position: center; border-radius: 16px; border: 1px solid #303030; background: #000; display: block; }
-    .video-frame { padding: 10px; }
-    .product-video { min-height: unset; }
-    .video-frame video, .video-frame iframe { width: 100%; aspect-ratio: 16/9; display: block; object-fit: contain; border: 0; border-radius: 20px; background: #000; }
-    .video-label { position: absolute; left: 24px; bottom: 24px; background: rgba(0,0,0,.72); border: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 999px; display: flex; gap: 8px; align-items: center; font-size: 12px; font-weight: 800; }
-    .lightbox { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.92); display: grid; place-items: center; padding: 34px; }
-    .lightbox img { max-width: min(92vw, 1400px); max-height: 88vh; width: auto; height: auto; object-fit: contain; border-radius: 24px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 30px 100px rgba(0,0,0,.65); }
-    .lightbox-close, .lightbox-arrow { position: fixed; z-index: 1001; border: 1px solid rgba(255,255,255,.18); background: rgba(20,20,20,.86); color: white; border-radius: 999px; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(12px); }
-    .lightbox-close { top: 22px; right: 22px; width: 46px; height: 46px; }
-    .lightbox-arrow { top: 50%; transform: translateY(-50%); width: 52px; height: 52px; }
-    .lightbox-arrow.left { left: 22px; }
-    .lightbox-arrow.right { right: 22px; }
-    .lightbox-count { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); color: #b5b5b5; font-size: 12px; font-weight: 800; letter-spacing: .12em; }
+
+    .project-grid { max-width: 1200px; margin: 0 auto; padding: 0 48px 150px; display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 20px; }
+    @media (min-width: 640px) { .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; } }
+    @media (min-width: 1024px) { .project-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+
+    .card { position: relative; background: #141414; border: 1px solid #242424; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: border-color .3s, transform .3s, box-shadow .3s; }
+    .card:hover, .card:focus-within { border-color: color-mix(in srgb, var(--accent) 45%, #333); box-shadow: 0 22px 44px -26px color-mix(in srgb, var(--accent) 45%, transparent); transform: translateY(-3px); }
+    .card.orphan { grid-column: 1 / -1; justify-self: center; width: 100%; max-width: 360px; }
+
+    .slideshow { position: relative; aspect-ratio: 4/3; overflow: hidden; background: radial-gradient(120% 100% at 15% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), #101010; border-bottom: 1px solid #242424; touch-action: pan-y; user-select: none; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px; opacity: 0; transition: opacity .55s ease; }
+    .slide.active { opacity: 1; }
+    .slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; border-radius: 8px; box-shadow: 0 16px 32px -16px rgba(0,0,0,.65); }
+    .slide.placeholder { flex-direction: column; gap: 8px; color: #666; }
+    .slide.placeholder svg { color: var(--accent); opacity: .55; }
+    .slide.placeholder span { font-size: 11px; letter-spacing: .03em; }
+    .idx-pill, .status-pill { position: absolute; top: 10px; z-index: 3; font-size: 10.5px; letter-spacing: .04em; color: #fff; background: rgba(9,9,9,.6); backdrop-filter: blur(6px); padding: 5px 9px; border-radius: 999px; border: 1px solid #242424; display: flex; align-items: center; gap: 6px; }
+    .idx-pill { left: 10px; color: #b5b5b5; }
+    .status-pill { right: 10px; }
+    .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+    .dots { position: absolute; bottom: 10px; left: 0; right: 0; z-index: 3; display: flex; justify-content: center; gap: 5px; }
+    .dots button { border: 0; padding: 0; width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.35); cursor: pointer; transition: all .25s ease; }
+    .dots button.active { background: var(--accent); width: 14px; border-radius: 3px; }
+    .nav-arrow { position: absolute; top: 50%; translate: 0 -50%; z-index: 3; width: 28px; height: 28px; border: 1px solid #242424; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(9,9,9,.6); backdrop-filter: blur(6px); color: #fff; cursor: pointer; opacity: 0; transition: opacity .2s ease; }
+    .slideshow:hover .nav-arrow { opacity: 1; }
+    .nav-arrow.prev { left: 8px; } .nav-arrow.next { right: 8px; }
+
+    .card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .card-head { display: flex; align-items: center; gap: 12px; }
+    .card-icon { width: 42px; height: 42px; border-radius: 12px; overflow: hidden; flex: none; border: 1px solid #242424; }
+    .card-icon img, .card-icon svg { width: 100%; height: 100%; display: block; }
+    .card-head h3 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+    .card-type { margin: 2px 0 0; font-size: 12px; color: #777; }
+    .card-desc { margin: 0; font-size: 13.5px; line-height: 1.6; color: #b5b5b5; }
+    .card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; flex-wrap: wrap; }
+    .details-link { border: 0; background: none; padding: 0; cursor: pointer; font-size: 12.5px; font-weight: 800; color: #b5b5b5; display: inline-flex; align-items: center; gap: 5px; transition: color .2s; }
+    .details-link:hover { color: #fff; }
+
+    .btn { border: 1px solid #333; background: transparent; color: #fff; cursor: pointer; font-size: 12.5px; font-weight: 800; text-decoration: none; padding: 8px 13px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; transition: opacity .2s, transform .2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn.solid { background: #fff; color: #090909; border-color: #fff; }
+    .btn.soon { border-style: dashed; color: #777; cursor: default; }
+    .btn.soon:hover { transform: none; }
+
+    .play-badge { display: inline-flex; align-items: center; gap: 9px; background: #000; border: 1px solid #3d3d3f; border-radius: 10px; padding: 7px 13px 7px 11px; text-decoration: none; transition: transform .2s, border-color .2s; }
+    .play-badge:hover { border-color: #6b6b6b; transform: translateY(-2px); }
+    .play-badge .txt { display: flex; flex-direction: column; line-height: 1.1; }
+    .play-badge .txt .g { font-size: 8.5px; letter-spacing: .05em; color: #cfcfcf; text-transform: uppercase; }
+    .play-badge .txt .n { font-size: 15px; color: #fff; font-weight: 700; }
+    .beta-badge { display: inline-flex; align-items: center; gap: 8px; background: #191919; border: 1px solid #333; border-radius: 10px; padding: 8px 13px; text-decoration: none; color: #fff; font-size: 12.5px; font-weight: 800; transition: border-color .2s, transform .2s; }
+    .beta-badge:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(6,6,7,.75); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal { width: 100%; max-width: 640px; max-height: 88vh; overflow-y: auto; background: #141414; border: 1px solid #333; border-radius: 22px; }
+    .modal .slideshow { aspect-ratio: 4/3; border-radius: 22px 22px 0 0; }
+    .modal-close { position: absolute; top: 14px; right: 14px; z-index: 4; border: 1px solid #242424; background: rgba(9,9,9,.6); backdrop-filter: blur(6px); color: #fff; cursor: pointer; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { border-color: #555; }
+    .modal-video { border-radius: 22px 22px 0 0; border-bottom: 1px solid #242424; margin: 0; }
+    .modal-body { padding: 28px 30px 30px; }
+    .modal-body .card-head { margin-bottom: 14px; }
+    .modal-body h3 { font-size: 23px; }
+    .modal-body .card-desc { font-size: 14.5px; line-height: 1.7; max-width: 60ch; }
+    .bullets { list-style: none; margin: 4px 0 26px; padding: 0; display: grid; gap: 11px; }
+    .bullets li { display: flex; gap: 10px; font-size: 13.5px; line-height: 1.6; color: #b5b5b5; }
+    .bullets li::before { content: ""; flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 7px; }
+    .modal-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; border-top: 1px solid #242424; padding-top: 20px; margin-top: 4px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .video-frame { content-visibility: auto; contain-intrinsic-size: 480px; position: relative; background: #000; overflow: hidden; }
+    .video-frame iframe { width: 100%; aspect-ratio: 16/9; display: block; border: 0; background: #000; }
     .beyond-section, .capabilities, .journey { border-top: 1px solid #242424; }
     .beyond-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: -24px auto 28px; max-width: 1200px; padding: 0 48px; }
     .beyond-filters button { border: 1px solid #242424; background: #111; color: #9a9a9a; border-radius: 999px; padding: 9px 14px; font-size: 12px; font-weight: 900; cursor: pointer; transition: .22s; }
@@ -862,15 +1027,11 @@ function Style() {
     @keyframes softBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
     @media (max-width: 900px) {
       .nav { padding: 0 20px; } .nav-links, .nav-cta { display: none; } .nav-menu { display: inline-flex; } .nav.open .mobile-panel { display: block; }
-      .about-section, .project-section, .project-section.reverse, .journey { grid-template-columns: 1fr; gap: 44px; }
-      .project-section.reverse .project-copy { order: initial; }
-      .section, .project-section, .section-head, .contact-section { padding-left: 22px; padding-right: 22px; }
+      .about-section, .journey { grid-template-columns: 1fr; gap: 44px; }
+      .section, .section-head, .contact-section { padding-left: 22px; padding-right: 22px; }
+      .project-grid { padding-left: 22px; padding-right: 22px; padding-bottom: 104px; }
       .section-head { padding-top: 104px; padding-bottom: 62px; }
       .section-head h2 { margin-bottom: 18px; }
-      .phone-grid { grid-template-columns: repeat(4, 1fr); }
-      .preview-phone-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .preview-desktop-grid { grid-template-columns: 1fr; }
-      .featured-phone { width: min(100%, 300px); }
       .beyond-grid, .cap-grid { grid-template-columns: 1fr; }
       .beyond-filters { padding: 0 22px; }
       .journey-sticky { position: static; }
@@ -886,23 +1047,11 @@ function Style() {
       .hero-kicker { font-size: 14px; margin-top: 24px; }
       .hero-subtitle { font-size: 9px; line-height: 1.8; }
       .intro-skip { right: 18px; bottom: 18px; }
-      .project-copy h3 { font-size: 46px; }
-      .phone-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .preview-phone-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-      .preview-desktop-grid { grid-template-columns: 1fr; gap: 10px; }
-      .preview-phone-card { border-radius: 18px; padding: 6px; }
-      .preview-phone-card img { border-radius: 13px; }
-      .gallery-actions { align-items: stretch; }
-      .view-gallery-button { width: 100%; }
-      .featured-phone { width: min(100%, 260px); border-radius: 26px; }
-      .featured-phone img { border-radius: 26px; }
-      .app-icon { width: 58px; height: 58px; border-radius: 16px; }
-      .lightbox-arrow { width: 44px; height: 44px; }
-      .lightbox-arrow.left { left: 10px; }
-      .lightbox-arrow.right { right: 10px; }
-      .lightbox { padding: 20px; }
-      .contact-options, .cta-row, .project-actions, .hero-actions { align-items: stretch; }
-      .contact-options > *, .cta-row > *, .project-actions > *, .hero-actions > * { width: 100%; }
+      .modal-body h3 { font-size: 20px; }
+      .modal-bottom { flex-direction: column; align-items: stretch; }
+      .card-foot { align-items: stretch; }
+      .contact-options, .cta-row, .hero-actions { align-items: stretch; }
+      .contact-options > *, .cta-row > *, .hero-actions > * { width: 100%; }
     }
   `}</style>;
 }
