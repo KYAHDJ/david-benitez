@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, Download, Linkedin, Menu, Play, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, Download, Linkedin, Lock, Menu, Play, X } from "lucide-react";
 
 type ProjectAction =
   | { kind: "play"; href: string }
@@ -23,6 +23,7 @@ type Project = {
   youtubeEmbed?: string;
   accent: string;
   action: ProjectAction;
+  notice?: string;
 };
 
 function useInView(threshold = 0.12, once = true) {
@@ -426,6 +427,28 @@ const PROJECTS: Project[] = [
     accent: "#14B8A6",
     action: { kind: "download", label: "Download APK", href: "https://media.githubusercontent.com/media/KYAHDJ/david-benitez/main/public/downloads/DryNav.apk" },
   },
+  {
+    id: "06",
+    name: "DoLumin",
+    type: "Website · Shopify store",
+    status: "Live Demo Store",
+    desc: "A fictional clean-beauty skincare brand built as a fully working Shopify storefront: a custom home page, real product pages with cart and checkout, and a filterable, sortable collection page. The brand and products are not real, this is a portfolio sample.",
+    tags: ["Shopify", "Liquid", "JavaScript", "CSS", "E-commerce"],
+    bullets: [
+      "Built a custom Shopify theme from scratch: hero, bestsellers grid, brand philosophy section, ingredient spotlight, and a rotating customer-testimonials carousel.",
+      "Fully functional product pages with quantity selection, add-to-cart, and Shopify's native checkout flow.",
+      "Collection page wired to Shopify's storefront filtering and sorting, by availability, price, and alphabetical order.",
+      "Password-protected as a development store since it's a design sample and not a real, operating business.",
+    ],
+    icon: undefined,
+    screenshots: [
+      "/assets/projects/dolumin/screenshot-1.png",
+      "/assets/projects/dolumin/screenshot-2.png",
+    ],
+    accent: "#8FA37E",
+    action: { kind: "link", label: "View live site", href: "https://dolumin.myshopify.com/" },
+    notice: "Password: DoLuminShopifySamplePageByKyaiko",
+  },
 ];
 
 function ActionButton({ project }: { project: Project }) {
@@ -555,7 +578,7 @@ function ImgIcon() {
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
   return (
-    <article className="card" onClick={onOpen}>
+    <article className="card" style={{ ["--accent" as any]: project.accent }} onClick={onOpen}>
       <Slideshow project={project} variant="card" />
       <div className="card-body">
         <div className="card-head">
@@ -564,6 +587,7 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
         </div>
         <p className="card-desc">{project.desc}</p>
         <div className="chips">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+        {project.notice && <p className="store-notice"><Lock size={12} />{project.notice}</p>}
         <div className="card-foot">
           <ActionButton project={project} />
           <button className="details-link" onClick={(e) => { e.stopPropagation(); onOpen(); }}>
@@ -588,7 +612,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 
   return (
     <div className="overlay open" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={`${project.name} details`}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label={`${project.name} details`} style={{ ["--accent" as any]: project.accent }}>
         <button className="modal-close" onClick={onClose} aria-label="Close"><X size={14} /></button>
         {project.youtubeEmbed ? (
           <div className="video-frame modal-video">
@@ -611,6 +635,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
           <p className="card-desc">{project.desc}</p>
           <div className="chips">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
           <ul className="bullets">{project.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+          {project.notice && <p className="store-notice"><Lock size={13} />{project.notice}</p>}
           <div className="modal-bottom">
             <div className="actions">
               <ActionButton project={project} />
@@ -650,7 +675,7 @@ function SelectedWork() {
         <Reveal>
           <p className="eyebrow">Selected Work</p>
           <h2>Things I've built.</h2>
-          <p>Five projects, from a published Android app to one still taking shape, each built end to end from first commit to something real people use.</p>
+          <p>Six projects, from a published Android app to a Shopify storefront, each built end to end from first commit to something real people use.</p>
         </Reveal>
       </div>
       <Reveal delay={0.1}>
@@ -970,6 +995,8 @@ function Style() {
     .card-head h3 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
     .card-type { margin: 2px 0 0; font-size: 12px; color: #777; }
     .card-desc { margin: 0; font-size: 13.5px; line-height: 1.6; color: #b5b5b5; }
+    .store-notice { display: flex; align-items: center; gap: 6px; margin: -4px 0 0; font-size: 11.5px; color: var(--accent); }
+    .store-notice svg { flex: none; }
     .card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; flex-wrap: wrap; }
     .details-link { border: 0; background: none; padding: 0; cursor: pointer; font-size: 12.5px; font-weight: 800; color: #b5b5b5; display: inline-flex; align-items: center; gap: 5px; transition: color .2s; }
     .details-link:hover { color: #fff; }
