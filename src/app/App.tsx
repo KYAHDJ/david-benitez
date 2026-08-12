@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, Download, Linkedin, Lock, Menu, Play, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDown, ArrowLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Copy, Download, Linkedin, Lock, Menu, Play, X } from "lucide-react";
 
 type ProjectAction =
   | { kind: "play"; href: string }
@@ -367,7 +367,7 @@ const PROJECTS: Project[] = [
     id: "03",
     name: "Sama Na U Wedding",
     type: "Website",
-    status: "Live Website",
+    status: "Sample Website",
     desc: "A responsive wedding website built to present event details, countdown, venues, gallery, and RSVP information in a clean and elegant layout.",
     tags: ["HTML", "CSS", "JavaScript", "GitHub Pages"],
     bullets: [
@@ -463,11 +463,37 @@ const PROJECTS: Project[] = [
       "Local notifications for savings reminders, AdMob-supported free tier, and Firestore offline persistence so progress still loads without a connection.",
     ],
     icon: { type: "img", src: "/assets/projects/moneymarathon/icon.png" },
-    screenshots: [],
+    screenshots: [
+      "/assets/projects/moneymarathon/screenshot-0-feature.png",
+      "/assets/projects/moneymarathon/screenshot-1.jpg",
+      "/assets/projects/moneymarathon/screenshot-2.jpg",
+      "/assets/projects/moneymarathon/screenshot-3.jpg",
+      "/assets/projects/moneymarathon/screenshot-4.jpg",
+    ],
     accent: "#2E7D5B",
     action: { kind: "beta", label: "View on Google Play", href: "https://play.google.com/apps/testing/com.moneymarathon.app" },
   },
 ];
+
+type WorkCategory = { id: string; label: string; accent: string; projectIds: string[] };
+
+const WORK_CATEGORIES: WorkCategory[] = [
+  { id: "apps", label: "Apps", accent: "#8B5CF6", projectIds: ["01", "02", "05", "07"] },
+  { id: "websites", label: "Websites", accent: "#D4AF37", projectIds: ["03", "06"] },
+  { id: "games", label: "Games", accent: "#F97316", projectIds: ["04"] },
+];
+
+function categoryImages(projectIds: string[]): string[] {
+  const images: string[] = [];
+  projectIds.forEach((id) => {
+    const project = PROJECTS.find((p) => p.id === id);
+    if (!project) return;
+    if (project.screenshots.length) images.push(...project.screenshots);
+    else if (project.youtubeEmbed) images.push(youtubeThumb(project.youtubeEmbed));
+    else if (project.icon?.type === "img") images.push(project.icon.src);
+  });
+  return images;
+}
 
 function ActionButton({ project }: { project: Project }) {
   const a = project.action;
@@ -666,9 +692,50 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
   );
 }
 
+function CategoryBg({ images }: { images: string[] }) {
+  const shuffled = useMemo(() => {
+    const arr = [...images];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [images]);
+  const [i, setI] = useState(0);
+
+  useEffect(() => {
+    if (shuffled.length < 2) return;
+    const t = setInterval(() => setI((v) => (v + 1) % shuffled.length), 1000);
+    return () => clearInterval(t);
+  }, [shuffled.length]);
+
+  return (
+    <span className="cat-bg">
+      {shuffled.map((src, idx) => (
+        <img key={src} src={src} className={idx === i ? "active" : ""} alt="" loading="lazy" decoding="async" />
+      ))}
+    </span>
+  );
+}
+
+function CategoryButton({ cat, count, state, onClick }: { cat: WorkCategory; count: number; state: string; onClick: () => void }) {
+  return (
+    <button className={`category-btn ${state}`} style={{ ["--cat-accent" as any]: cat.accent }} onClick={onClick}>
+      <CategoryBg images={categoryImages(cat.projectIds)} />
+      <span className="cat-overlay" />
+      <span className="cat-label">
+        {cat.label}
+        <small>{count} project{count === 1 ? "" : "s"}</small>
+      </span>
+    </button>
+  );
+}
+
 function SelectedWork() {
-  const gridRef = useRef<HTMLDivElement>(null);
+  const [activeCat, setActiveCat] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"categories" | "toDetail" | "detail" | "toCategories">("categories");
   const [openId, setOpenId] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const [cols, setCols] = useState(3);
 
   useEffect(() => {
@@ -678,14 +745,30 @@ function SelectedWork() {
     compute();
     window.addEventListener("resize", compute);
     return () => window.removeEventListener("resize", compute);
-  }, []);
+  }, [phase]);
 
-  const remainder = PROJECTS.length % cols;
-  const splitAt = remainder === 0 ? PROJECTS.length : PROJECTS.length - remainder;
-  const mainItems = PROJECTS.slice(0, splitAt);
-  const leftoverItems = PROJECTS.slice(splitAt);
+  const category = WORK_CATEGORIES.find((c) => c.id === activeCat) || null;
+  const filtered = category ? PROJECTS.filter((p) => category.projectIds.includes(p.id)) : [];
+  const remainder = filtered.length ? filtered.length % cols : 0;
+  const splitAt = remainder === 0 ? filtered.length : filtered.length - remainder;
+  const mainItems = filtered.slice(0, splitAt);
+  const leftoverItems = filtered.slice(splitAt);
 
   const openProject = PROJECTS.find((p) => p.id === openId) || null;
+  const activeIdx = WORK_CATEGORIES.findIndex((c) => c.id === activeCat);
+
+  function selectCategory(id: string) {
+    setActiveCat(id);
+    setPhase("toDetail");
+    setTimeout(() => setPhase("detail"), 480);
+  }
+  function goBack() {
+    setPhase("toCategories");
+    setTimeout(() => {
+      setPhase("categories");
+      setActiveCat(null);
+    }, 380);
+  }
 
   return (
     <section id="work" className="work">
@@ -693,23 +776,50 @@ function SelectedWork() {
         <Reveal>
           <p className="eyebrow">Selected Work</p>
           <h2>Things I've built.</h2>
-          <p>Seven projects, from a published Android app to a Shopify storefront, each built end to end from first commit to something real people use.</p>
+          <p>Seven projects, organized into apps, websites, and games. Pick a lane to explore.</p>
         </Reveal>
       </div>
-      <Reveal delay={0.1}>
-        <div className="project-grid" ref={gridRef}>
-          {mainItems.map((project) => (
-            <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
-          ))}
-          {leftoverItems.length > 0 && (
-            <div className="orphan-row">
-              {leftoverItems.map((project) => (
-                <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
-              ))}
-            </div>
-          )}
+
+      {phase !== "detail" && (
+        <Reveal delay={0.1}>
+          <div className={`category-grid ${phase === "toDetail" ? "leaving" : ""}`}>
+            {WORK_CATEGORIES.map((cat, i) => {
+              let state = "";
+              if (phase === "toDetail") state = cat.id === activeCat ? "zoom" : i < activeIdx ? "out-left" : "out-right";
+              return (
+                <CategoryButton
+                  key={cat.id}
+                  cat={cat}
+                  count={cat.projectIds.length}
+                  state={state}
+                  onClick={() => selectCategory(cat.id)}
+                />
+              );
+            })}
+          </div>
+        </Reveal>
+      )}
+
+      {(phase === "detail" || phase === "toCategories") && category && (
+        <div className={`category-detail ${phase === "toCategories" ? "leaving" : ""}`} style={{ ["--cat-accent" as any]: category.accent }}>
+          <div className="category-detail-head">
+            <button className="btn back-btn" onClick={goBack}><ArrowLeft size={14} /> Back to categories</button>
+          </div>
+          <div className="project-grid" ref={gridRef}>
+            {mainItems.map((project) => (
+              <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
+            ))}
+            {leftoverItems.length > 0 && (
+              <div className="orphan-row">
+                {leftoverItems.map((project) => (
+                  <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </Reveal>
+      )}
+
       {openProject && <ProjectModal project={openProject} onClose={() => setOpenId(null)} />}
     </section>
   );
@@ -977,6 +1087,27 @@ function Style() {
     @media (min-width: 1024px) { .orphan-row { gap: 24px; } }
     .orphan-row > .card { flex: 0 1 340px; }
 
+    .category-grid { max-width: 1200px; margin: 0 auto; padding: 0 48px 60px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; animation: catGridIn .5s cubic-bezier(.22,1,.36,1) both; }
+    .category-grid.leaving .category-btn { pointer-events: none; }
+    .category-btn { position: relative; aspect-ratio: 1; min-width: 0; border: 2px solid #242424; border-radius: 20px; overflow: hidden; cursor: pointer; background: #141414; padding: 0; transition: transform .45s cubic-bezier(.22,1,.36,1), opacity .45s ease, border-color .3s ease, box-shadow .3s ease; }
+    .category-btn:hover, .category-btn:focus-visible { border-color: var(--cat-accent); box-shadow: 0 22px 50px -22px color-mix(in srgb, var(--cat-accent) 55%, transparent); transform: translateY(-4px); }
+    .category-btn.zoom { transform: scale(1.2); opacity: 0; }
+    .category-btn.out-left { transform: translateX(-70px) scale(.82); opacity: 0; }
+    .category-btn.out-right { transform: translateX(70px) scale(.82); opacity: 0; }
+    .cat-bg { position: absolute; inset: 0; }
+    .cat-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease; }
+    .cat-bg img.active { opacity: 1; }
+    .cat-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,9,9,.88), rgba(9,9,9,.2) 55%, rgba(9,9,9,.4)); }
+    .cat-label { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; padding: 18px; color: #fff; font-weight: 950; font-size: clamp(17px, 3.4vw, 30px); letter-spacing: -.03em; text-align: left; }
+    .cat-label small { font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--cat-accent); }
+    @keyframes catGridIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+    .category-detail { animation: catDetailIn .5s cubic-bezier(.22,1,.36,1) both; }
+    .category-detail.leaving { animation: none; opacity: 0; transform: translateY(14px) scale(.98); transition: opacity .35s ease, transform .35s ease; }
+    .category-detail-head { max-width: 1200px; margin: 0 auto; padding: 0 48px 22px; }
+    .back-btn { display: inline-flex; }
+    @keyframes catDetailIn { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+
     .card { position: relative; background: #141414; border: 1px solid #242424; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: border-color .3s, transform .3s, box-shadow .3s; }
     .card:hover, .card:focus-within { border-color: color-mix(in srgb, var(--accent) 45%, #333); box-shadow: 0 22px 44px -26px color-mix(in srgb, var(--accent) 45%, transparent); transform: translateY(-3px); }
 
@@ -1090,9 +1221,14 @@ function Style() {
       .about-section, .journey { grid-template-columns: 1fr; gap: 44px; }
       .section, .section-head, .contact-section { padding-left: 22px; padding-right: 22px; }
       .project-grid { padding-left: 22px; padding-right: 22px; padding-bottom: 104px; }
+      .category-grid { padding-left: 22px; padding-right: 22px; gap: 10px; }
+      .category-detail-head { padding-left: 22px; padding-right: 22px; }
       .section-head { padding-top: 104px; padding-bottom: 62px; }
       .section-head h2 { margin-bottom: 18px; }
-      .beyond-grid, .cap-grid { grid-template-columns: 1fr; }
+      .beyond-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding-left: 22px; padding-right: 22px; }
+      .beyond-video-meta { padding: 12px; }
+      .beyond-video-meta h3 { font-size: 15px; margin: 6px 0 8px; }
+      .cap-grid { grid-template-columns: 1fr; }
       .beyond-filters { padding: 0 22px; }
       .journey-sticky { position: static; }
     }
@@ -1108,6 +1244,9 @@ function Style() {
       .hero-subtitle { font-size: 9px; line-height: 1.8; }
       .intro-skip { right: 18px; bottom: 18px; }
       .modal-body h3 { font-size: 20px; }
+      .category-grid { gap: 8px; }
+      .category-btn { border-radius: 14px; }
+      .cat-label { padding: 10px; }
       .modal-bottom { flex-direction: column; align-items: stretch; }
       .card-foot { align-items: stretch; }
       .contact-options, .cta-row, .hero-actions { align-items: stretch; }
