@@ -449,6 +449,24 @@ const PROJECTS: Project[] = [
     action: { kind: "link", label: "View live site", href: "https://dolumin.myshopify.com/" },
     notice: "Password: DoLuminShopifySamplePageByKyaiko",
   },
+  {
+    id: "07",
+    name: "Money Marathon",
+    type: "Android · Group savings tracker",
+    status: "Closed Beta Testing",
+    desc: "A savings race for you and your friends: everyone gets a lane and the same finish line. Built with Preact and htm on top of Cloud Firestore, so every open device gets live updates as racers save toward a shared goal.",
+    tags: ["Preact", "htm", "Firebase", "Firestore", "Capacitor", "AdMob"],
+    bullets: [
+      "Host a 'race' toward a shared goal, like a trip, and share a join code so friends can add themselves as racers.",
+      "Each racer sets their own savings goal, cadence, and bank or wallet, tracked in real time as an actual race track with a customizable running character.",
+      "Savings calendar, per-racer dashboards, and one-tap PDF export of a racer's savings summary.",
+      "Local notifications for savings reminders, AdMob-supported free tier, and Firestore offline persistence so progress still loads without a connection.",
+    ],
+    icon: { type: "img", src: "/assets/projects/moneymarathon/icon.png" },
+    screenshots: [],
+    accent: "#2E7D5B",
+    action: { kind: "beta", label: "View on Google Play", href: "https://play.google.com/apps/testing/com.moneymarathon.app" },
+  },
 ];
 
 function ActionButton({ project }: { project: Project }) {
@@ -675,7 +693,7 @@ function SelectedWork() {
         <Reveal>
           <p className="eyebrow">Selected Work</p>
           <h2>Things I've built.</h2>
-          <p>Six projects, from a published Android app to a Shopify storefront, each built end to end from first commit to something real people use.</p>
+          <p>Seven projects, from a published Android app to a Shopify storefront, each built end to end from first commit to something real people use.</p>
         </Reveal>
       </div>
       <Reveal delay={0.1}>
