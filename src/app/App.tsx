@@ -471,7 +471,7 @@ const PROJECTS: Project[] = [
       "/assets/projects/moneymarathon/screenshot-4.jpg",
     ],
     accent: "#2E7D5B",
-    action: { kind: "beta", label: "View on Google Play", href: "https://play.google.com/apps/testing/com.moneymarathon.app" },
+    action: { kind: "beta", label: "Join closed testing", href: "https://play.google.com/apps/testing/com.moneymarathon.app" },
   },
 ];
 
@@ -1097,8 +1097,8 @@ function Style() {
     .cat-bg { position: absolute; inset: 0; }
     .cat-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); filter: blur(6px); transition: opacity 1s ease; }
     .cat-bg img.active { opacity: 1; }
-    .cat-overlay { position: absolute; inset: 0; background: rgba(9,9,9,.1); }
-    .cat-label { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; padding: 18px; color: #fff; font-weight: 950; font-size: clamp(17px, 3.4vw, 30px); letter-spacing: -.03em; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
+    .cat-overlay { position: absolute; inset: 0; background: rgba(9,9,9,.4); }
+    .cat-label { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; padding: 18px; color: #fff; font-weight: 950; font-size: clamp(20px, 4.2vw, 36px); letter-spacing: -.03em; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
     .cat-label small { font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--cat-accent); }
     @keyframes catGridIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
