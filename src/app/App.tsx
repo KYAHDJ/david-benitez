@@ -1095,10 +1095,10 @@ function Style() {
     .category-btn.out-left { transform: translateX(-70px) scale(.82); opacity: 0; }
     .category-btn.out-right { transform: translateX(70px) scale(.82); opacity: 0; }
     .cat-bg { position: absolute; inset: 0; }
-    .cat-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease; }
+    .cat-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); filter: blur(6px); transition: opacity 1s ease; }
     .cat-bg img.active { opacity: 1; }
-    .cat-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,9,9,.88), rgba(9,9,9,.2) 55%, rgba(9,9,9,.4)); }
-    .cat-label { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; padding: 18px; color: #fff; font-weight: 950; font-size: clamp(17px, 3.4vw, 30px); letter-spacing: -.03em; text-align: left; }
+    .cat-overlay { position: absolute; inset: 0; background: rgba(9,9,9,.1); }
+    .cat-label { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; padding: 18px; color: #fff; font-weight: 950; font-size: clamp(17px, 3.4vw, 30px); letter-spacing: -.03em; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
     .cat-label small { font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--cat-accent); }
     @keyframes catGridIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
