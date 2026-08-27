@@ -342,6 +342,30 @@ const PROJECTS: Project[] = [
   },
   {
     id: "02",
+    name: "Money Marathon",
+    type: "Android · Group savings tracker",
+    status: "Live on Google Play",
+    desc: "A savings race for you and your friends: everyone gets a lane and the same finish line. Built with Preact and htm on top of Cloud Firestore, so every open device gets live updates as racers save toward a shared goal.",
+    tags: ["Preact", "htm", "Firebase", "Firestore", "Capacitor", "AdMob"],
+    bullets: [
+      "Host a 'race' toward a shared goal, like a trip, and share a join code so friends can add themselves as racers.",
+      "Each racer sets their own savings goal, cadence, and bank or wallet, tracked in real time as an actual race track with a customizable running character.",
+      "Savings calendar, per-racer dashboards, and one-tap PDF export of a racer's savings summary.",
+      "Local notifications for savings reminders, AdMob-supported free tier, and Firestore offline persistence so progress still loads without a connection.",
+    ],
+    icon: undefined,
+    screenshots: [
+      "/assets/projects/moneymarathon/screenshot-1.png",
+      "/assets/projects/moneymarathon/screenshot-2.png",
+      "/assets/projects/moneymarathon/screenshot-3.png",
+      "/assets/projects/moneymarathon/screenshot-4.png",
+      "/assets/projects/moneymarathon/screenshot-5.png",
+    ],
+    accent: "#2E7D5B",
+    action: { kind: "play", href: "https://play.google.com/store/apps/details?id=com.moneymarathon.app" },
+  },
+  {
+    id: "03",
     name: "Dosevia",
     type: "Android · Medication reminders",
     status: "Open Beta Testing",
@@ -364,7 +388,7 @@ const PROJECTS: Project[] = [
     action: { kind: "beta", label: "Join the open beta", href: "https://play.google.com/apps/testing/com.dosevia.app" },
   },
   {
-    id: "03",
+    id: "04",
     name: "Sama Na U Wedding",
     type: "Website",
     status: "Sample Website",
@@ -385,7 +409,7 @@ const PROJECTS: Project[] = [
     action: { kind: "link", label: "View live site", href: "https://kyahdj.github.io/SamaNaUWedding/" },
   },
   {
-    id: "04",
+    id: "05",
     name: "PolyPath",
     type: "PC · Educational 3D game",
     status: "School Capstone Project",
@@ -403,7 +427,7 @@ const PROJECTS: Project[] = [
     action: { kind: "download", label: "Download for Windows", href: "https://github.com/KYAHDJ/david-benitez/releases/download/v1.0/PolyPath.zip" },
   },
   {
-    id: "05",
+    id: "06",
     name: "DryNav",
     type: "Android · Flood-aware navigation",
     status: "In Development",
@@ -428,7 +452,7 @@ const PROJECTS: Project[] = [
     action: { kind: "download", label: "Download APK", href: "https://media.githubusercontent.com/media/KYAHDJ/david-benitez/main/public/downloads/DryNav.apk" },
   },
   {
-    id: "06",
+    id: "07",
     name: "DoLumin",
     type: "Website · Shopify store",
     status: "Live Demo Store",
@@ -449,38 +473,14 @@ const PROJECTS: Project[] = [
     action: { kind: "link", label: "View live site", href: "https://dolumin.myshopify.com/" },
     notice: "Password: DoLuminShopifySamplePageByKyaiko",
   },
-  {
-    id: "07",
-    name: "Money Marathon",
-    type: "Android · Group savings tracker",
-    status: "Closed Beta Testing",
-    desc: "A savings race for you and your friends: everyone gets a lane and the same finish line. Built with Preact and htm on top of Cloud Firestore, so every open device gets live updates as racers save toward a shared goal.",
-    tags: ["Preact", "htm", "Firebase", "Firestore", "Capacitor", "AdMob"],
-    bullets: [
-      "Host a 'race' toward a shared goal, like a trip, and share a join code so friends can add themselves as racers.",
-      "Each racer sets their own savings goal, cadence, and bank or wallet, tracked in real time as an actual race track with a customizable running character.",
-      "Savings calendar, per-racer dashboards, and one-tap PDF export of a racer's savings summary.",
-      "Local notifications for savings reminders, AdMob-supported free tier, and Firestore offline persistence so progress still loads without a connection.",
-    ],
-    icon: { type: "img", src: "/assets/projects/moneymarathon/icon.png" },
-    screenshots: [
-      "/assets/projects/moneymarathon/screenshot-0-feature.png",
-      "/assets/projects/moneymarathon/screenshot-1.jpg",
-      "/assets/projects/moneymarathon/screenshot-2.jpg",
-      "/assets/projects/moneymarathon/screenshot-3.jpg",
-      "/assets/projects/moneymarathon/screenshot-4.jpg",
-    ],
-    accent: "#2E7D5B",
-    action: { kind: "beta", label: "Join closed testing", href: "https://play.google.com/apps/testing/com.moneymarathon.app" },
-  },
 ];
 
 type WorkCategory = { id: string; label: string; accent: string; projectIds: string[] };
 
 const WORK_CATEGORIES: WorkCategory[] = [
-  { id: "apps", label: "Apps", accent: "#8B5CF6", projectIds: ["01", "02", "05", "07"] },
-  { id: "websites", label: "Websites", accent: "#D4AF37", projectIds: ["03", "06"] },
-  { id: "games", label: "Games", accent: "#F97316", projectIds: ["04"] },
+  { id: "apps", label: "Apps", accent: "#8B5CF6", projectIds: ["01", "02", "03", "06"] },
+  { id: "websites", label: "Websites", accent: "#D4AF37", projectIds: ["04", "07"] },
+  { id: "games", label: "Games", accent: "#F97316", projectIds: ["05"] },
 ];
 
 function categoryImages(projectIds: string[]): string[] {
