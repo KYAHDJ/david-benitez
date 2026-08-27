@@ -353,7 +353,7 @@ const PROJECTS: Project[] = [
       "Savings calendar, per-racer dashboards, and one-tap PDF export of a racer's savings summary.",
       "Local notifications for savings reminders, AdMob-supported free tier, and Firestore offline persistence so progress still loads without a connection.",
     ],
-    icon: undefined,
+    icon: { type: "img", src: "/assets/projects/moneymarathon/icon.png" },
     screenshots: [
       "/assets/projects/moneymarathon/screenshot-1.png",
       "/assets/projects/moneymarathon/screenshot-2.png",
