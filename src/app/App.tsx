@@ -1039,7 +1039,7 @@ function Style() {
     .nav-links { display: flex; gap: 34px; color: #b5b5b5; font-size: 12px; }
     .nav-links a:hover { color: #fff; }
     .nav-cta { background: #fff; color: #090909; border-radius: 999px; padding: 8px 18px; font-size: 12px; font-weight: 800; }
-    .hero { height: 100dvh; min-height: 620px; display: grid; place-items: center; position: relative; overflow: hidden; padding: 32px; }
+    .hero { height: 100dvh; min-height: 620px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 56px 32px 0; }
     .grain { position: absolute; inset: 0; background: radial-gradient(circle at 50% 35%, rgba(255,255,255,.055), transparent 45%); }
     .hero-inner { position: relative; text-align: center; max-width: 1100px; }
     .hero-name { color: #777; font-size: 11px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 22px; opacity: 0; transform: translateY(12px); transition: .8s .1s; }
@@ -1054,8 +1054,9 @@ function Style() {
     .hero-actions a, .project-actions a, .about-buttons a, .cta-row a, .copy-button, .contact-options a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border: 1px solid #242424; border-radius: 999px; font-weight: 800; font-size: 13px; transition: .2s; background: transparent; color: #fff; cursor: pointer; }
     .hero-actions a:first-child, .project-actions a:first-child, .cta-row .primary { background: #fff; color: #090909; border-color: #fff; }
     .hero-actions a:hover, .project-actions a:hover, .about-buttons a:hover, .cta-row a:hover, .copy-button:hover, .contact-options a:hover { transform: translateY(-2px); border-color: #777; }
-    .scroll-cue { position: absolute; bottom: 38px; left: 50%; transform: translate(-50%, 12px); color: #b5b5b5; text-transform: uppercase; font-size: 10px; letter-spacing: .22em; opacity: 0; transition: .9s .55s; display: grid; place-items: center; gap: 10px; }
+    .scroll-cue { margin: 48px 0 0; padding-bottom: 48px; color: #b5b5b5; text-transform: uppercase; font-size: 10px; letter-spacing: .22em; opacity: 0; transform: translateY(12px); transition: .9s .55s; display: grid; place-items: center; gap: 10px; }
     .scroll-cue div { width: 1px; height: 44px; background: linear-gradient(#b5b5b5, transparent); }
+    @media (max-width: 520px) { .scroll-cue { margin: 36px 0 0; padding-bottom: 36px; } }
     .section { max-width: 1200px; margin: 0 auto; padding: 130px 48px; }
     .about-section { display: grid; grid-template-columns: 1fr .9fr; gap: 80px; align-items: center; }
     .eyebrow { color: #b5b5b5; font-size: 11px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; margin: 0 0 18px; }
